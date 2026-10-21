@@ -1,35 +1,5 @@
 window.IMOVEIS_PADRAO = [
   {
-    "titulo": "apartamento stiep",
-    "tipo": "Apartamento",
-    "local": "stiep",
-    "preco": "400000",
-    "quartos": "3",
-    "banheiros": "2",
-    "area": "100",
-    "descricao": "teste 1",
-    "vendido": false,
-    "fotos": [
-      "imagens/apartamento-stiep-1792614096237-1.jpg"
-    ],
-    "id": 1792614096237
-  },
-  {
-    "titulo": "apartamento stiep",
-    "tipo": "Apartamento",
-    "local": "salvador",
-    "preco": "300000",
-    "quartos": "3",
-    "banheiros": "2",
-    "area": "100",
-    "descricao": "teste de apt",
-    "vendido": false,
-    "fotos": [
-      "imagens/apartamento-stiep-1792613285436-1.jpg"
-    ],
-    "id": 1792613285436
-  },
-  {
     "id": 1,
     "titulo": "Casa Alto Padrão com Piscina",
     "tipo": "Casa",
