@@ -1,20 +1,5 @@
 window.IMOVEIS_PADRAO = [
   {
-    "titulo": "apartamento stiep",
-    "tipo": "Casa",
-    "local": "stiep",
-    "preco": "100.000",
-    "quartos": "3",
-    "banheiros": "2",
-    "area": "100",
-    "descricao": "teste",
-    "vendido": false,
-    "fotos": [
-      "imagens/apartamento-stiep-1792618441094-1.jpg"
-    ],
-    "id": 1792618441094
-  },
-  {
     "titulo": "casa stiep das casas",
     "tipo": "Casa",
     "local": "stiep das casas",
