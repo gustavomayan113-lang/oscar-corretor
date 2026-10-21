@@ -1,5 +1,20 @@
 window.IMOVEIS_PADRAO = [
   {
+    "titulo": "apartamento barra",
+    "tipo": "Apartamento",
+    "local": "barra",
+    "preco": "850000",
+    "quartos": "4",
+    "banheiros": "3",
+    "area": "338",
+    "descricao": "teste do ap da barra",
+    "vendido": false,
+    "fotos": [
+      "imagens/apartamento-barra-1792617041663-1.jpg"
+    ],
+    "id": 1792617041663
+  },
+  {
     "id": 1,
     "titulo": "Casa Alto Padrão com Piscina",
     "tipo": "Casa",
