@@ -78,7 +78,14 @@
         <button type="button" class="sm" id="cancelPub" style="width:auto">Fechar</button>
         <button type="submit" class="btn btn-gold" style="width:auto">Publicar agora</button>
       </div>
-      <p style="color:var(--muted);font-size:12px;margin:0">Sem token? Use o botão <b>Exportar data.js</b>: ele baixa o arquivo e você substitui o <b>data.js</b> no repositório do GitHub — a Vercel publica em seguida.</p>
+      <div class="sem-token">
+        <b>Sem token? Dá pra fazer do mesmo jeito, em 2 passos:</b>
+        <div class="del-acoes" style="justify-content:flex-start;margin-top:10px">
+          <button type="button" class="sm" id="abrirGithub" style="width:auto">1. Abrir o data.js no GitHub</button>
+          <button type="button" class="sm" id="baixarPacote" style="width:auto">2. Baixar pacote com as fotos</button>
+        </div>
+        <span>O passo 1 abre o editor do GitHub já com o conteúdo copiado: é só colar (Ctrl+V) e clicar em "Commit changes". O passo 2 baixa um zip com o data.js e a pasta imagens/ para você arrastar em "Add file → Upload files". Sem token, sem API, a Vercel publica assim mesmo.</span>
+      </div>
     </form>
   </div>
 </div>

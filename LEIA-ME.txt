@@ -41,15 +41,17 @@ COMO ADICIONAR IMÓVEIS
 2. O imóvel entra na lista do painel na hora (e aparece no site, no mesmo
    navegador).
 3. Clique em "Publicar no site" para que TODOS os visitantes vejam.
-   - Na primeira vez o painel pede o repositório do GitHub e um token:
-     Settings → Developer settings → Personal access tokens → Tokens (classic)
-     → Generate new token, marque a caixa "repo" e copie o código.
-   - O painel envia o arquivo data.js e as fotos (pasta imagens/) para o
-     GitHub e a Vercel publica sozinho em 1-2 minutos.
-   - Depois de configurado uma vez, todo imóvel salvo vai para o site
-     automaticamente, sem você precisar clicar em mais nada.
-   - Se preferir, use "Exportar data.js" e substitua o arquivo no repositório
-     pelo arquivo baixado (ele também vai copiado para a área de transferência).
+   - CAMPO AUTOMÁTICO (com token do GitHub): na primeira vez o painel pede o
+     repositório e um token (Settings → Developer settings → Personal access
+     tokens → Tokens (classic) → marque "repo"). O painel envia o data.js e as
+     fotos (pasta imagens/) para o GitHub e a Vercel publica em 1-2 minutos.
+     Depois de configurado uma vez, todo imóvel salvo vai para o site sozinho.
+   - SEM TOKEN (dois passos, dentro da mesma janela):
+     1) "Abrir o data.js no GitHub" abre o editor do GitHub com o conteúdo já
+        copiado: é só colar (Ctrl+V) e clicar em "Commit changes".
+     2) "Baixar pacote com as fotos" gera um zip com o data.js e a pasta
+        imagens/ para arrastar em "Add file → Upload files".
+     A Vercel publica do mesmo jeito.
 
 EXCLUIR UM IMÓVEL
 -----------------

@@ -116,6 +116,8 @@ label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bott
 .del-info span{font-size:13px;color:var(--muted)}
 .del-aviso{font-size:13px;color:var(--muted);margin-bottom:22px}
 .del-acoes{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.sem-token{border-top:1px dashed #e0d8c8;padding-top:16px;margin-top:4px;font-size:13px;color:var(--muted);line-height:1.55}
+.sem-token b{display:block;color:var(--navy);font-size:14px;margin-bottom:2px}
 .del-acoes .sm{margin-left:0}
 .del-acoes .del{background:#b42318;color:#fff;border-color:#b42318}
 .del-acoes .del:hover{background:#d13c2f;border-color:#d13c2f}

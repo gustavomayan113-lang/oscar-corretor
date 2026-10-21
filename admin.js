@@ -214,6 +214,81 @@ async function putFile(repo, branch, path, contentB64, token){
   if(!res.ok) throw new Error(j.message || ('HTTP ' + res.status));
   return j;
 }
+function nomesFotos(){
+  const cfg = cfgPub();
+  const publicados = cfg.publicados || {};
+  const mapa = {};
+  for(const im of imoveis){
+    const prev = publicados[im.id] || [];
+    mapa[im.id] = (im.fotos||[]).map((f,k) => {
+      if(typeof f !== 'string' || !f.startsWith('data:')) return f;
+      return prev[k] || (PASTA_FOTOS + '/' + slug(im.titulo) + '-' + im.id + '-' + (k+1) + '.jpg');
+    });
+  }
+  return mapa;
+}
+function textoDataJs(mapa){
+  return 'window.IMOVEIS_PADRAO = ' + JSON.stringify(imoveis.map(im => ({...im, fotos: mapa[im.id]})), null, 2) + ';\n';
+}
+function bytesBase64(dataUrl){
+  const bin = atob(dataUrl.slice(dataUrl.indexOf(',')+1));
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+let tabelaCrc = null;
+function crc32(bytes){
+  if(!tabelaCrc){
+    tabelaCrc = new Uint32Array(256);
+    for(let n=0;n<256;n++){
+      let c = n;
+      for(let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1);
+      tabelaCrc[n] = c>>>0;
+    }
+  }
+  let crc = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++) crc = tabelaCrc[(crc ^ bytes[i]) & 0xFF] ^ (crc>>>8);
+  return (crc ^ 0xFFFFFFFF)>>>0;
+}
+function fazerZip(arquivos){
+  const enc = new TextEncoder();
+  const partes = [];
+  const centro = [];
+  let offset = 0;
+  const ag = new Date();
+  const hora = ((ag.getHours()&31)<<11) | ((ag.getMinutes()&63)<<5) | ((ag.getSeconds()/2)&31);
+  const dia = (((ag.getFullYear()-1980)&127)<<9) | (((ag.getMonth()+1)&15)<<5) | (ag.getDate()&31);
+  for(const arq of arquivos){
+    const nome = enc.encode(arq.nome);
+    const crc = crc32(arq.bytes);
+    const lh = new Uint8Array(30 + nome.length);
+    const dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(8, 0, true);
+    dv.setUint16(10, hora, true); dv.setUint16(12, dia, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, arq.bytes.length, true); dv.setUint32(22, arq.bytes.length, true);
+    dv.setUint16(26, nome.length, true);
+    lh.set(nome, 30);
+    const cd = new Uint8Array(46 + nome.length);
+    const cv = new DataView(cd.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true); cv.setUint16(10, 0, true);
+    cv.setUint16(12, hora, true); cv.setUint16(14, dia, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, arq.bytes.length, true); cv.setUint32(24, arq.bytes.length, true);
+    cv.setUint16(28, nome.length, true); cv.setUint32(42, offset, true);
+    cd.set(nome, 46);
+    partes.push(lh, arq.bytes);
+    centro.push(cd);
+    offset += lh.length + arq.bytes.length;
+  }
+  let tamCentro = 0;
+  centro.forEach(c => tamCentro += c.length);
+  const fim = new Uint8Array(22);
+  const fv = new DataView(fim.buffer);
+  fv.setUint32(0, 0x06054b50, true);
+  fv.setUint16(8, centro.length, true); fv.setUint16(10, centro.length, true);
+  fv.setUint32(12, tamCentro, true); fv.setUint32(16, offset, true);
+  return new Blob([...partes, ...centro, fim], {type:'application/zip'});
+}
 async function publicar(){
   const cfg = cfgPub();
   if(!cfg.repo || !cfg.token){ $('pubErr').textContent = 'Preencha o repositório e o token.'; $('modalPub').classList.add('open'); return; }
@@ -222,28 +297,23 @@ async function publicar(){
   try {
     const publicados = cfg.publicados || {};
     const checks = cfg.checks || {};
-    const mapa = {};
+    const mapa = nomesFotos();
     const novosChecks = {};
     for(const im of imoveis){
-      const prev = publicados[im.id] || [];
-      const lista = [];
       for(let k=0;k<(im.fotos||[]).length;k++){
         const f = im.fotos[k];
-        if(typeof f !== 'string' || !f.startsWith('data:')){ lista.push(f); continue; }
+        if(typeof f !== 'string' || !f.startsWith('data:')) continue;
         const base = f.slice(f.indexOf(',')+1);
         const ck = checksum(base);
-        const nome = prev[k] || (PASTA_FOTOS + '/' + slug(im.titulo) + '-' + im.id + '-' + (k+1) + '.jpg');
+        const nome = mapa[im.id][k];
         if(checks[nome] !== ck){
           if(base.length > LIMITE_FOTO) throw new Error('a foto de "' + (im.titulo||'um imóvel') + '" é grande demais para publicar.');
           await putFile(cfg.repo, cfg.branch || 'main', nome, base, cfg.token);
         }
         novosChecks[nome] = ck;
-        lista.push(nome);
       }
-      mapa[im.id] = lista;
     }
-    const conteudo = 'window.IMOVEIS_PADRAO = ' + JSON.stringify(imoveis.map(im => ({...im, fotos: mapa[im.id]})), null, 2) + ';\n';
-    await putFile(cfg.repo, cfg.branch || 'main', 'data.js', b64(conteudo), cfg.token);
+    await putFile(cfg.repo, cfg.branch || 'main', 'data.js', b64(textoDataJs(mapa)), cfg.token);
     cfg.publicados = mapa; cfg.checks = novosChecks;
     cfg.ultimo = checksum(JSON.stringify(imoveis));
     cfg.em = Date.now();
@@ -288,6 +358,32 @@ $('fPub').onsubmit = e => {
 };
 
 function baixar(nome, txt, tipo){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:tipo})); a.download=nome; a.click(); }
+$('abrirGithub').onclick = () => {
+  const cfg = cfgPub();
+  const repo = cfg.repo || REPO_PADRAO;
+  const branch = cfg.branch || 'main';
+  const txt = textoDataJs(nomesFotos());
+  try { navigator.clipboard.writeText(txt); } catch {}
+  window.open('https://github.com/' + repo + '/edit/' + branch + '/data.js', '_blank');
+  toast('data.js copiado. Na aba do GitHub, cole (Ctrl+V) no lugar do texto antigo e clique em "Commit changes". A Vercel publica em seguida.', 'ok');
+};
+$('baixarPacote').onclick = () => {
+  const mapa = nomesFotos();
+  const arquivos = [{ nome:'data.js', bytes: new TextEncoder().encode(textoDataJs(mapa)) }];
+  for(const im of imoveis){
+    (im.fotos||[]).forEach((f,k) => {
+      if(typeof f !== 'string' || !f.startsWith('data:')) return;
+      arquivos.push({ nome: mapa[im.id][k], bytes: bytesBase64(f) });
+    });
+  }
+  const blob = fazerZip(arquivos);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'oscar-imoveis.zip'; a.click();
+  toast(arquivos.length > 1
+    ? 'Pacote baixado (data.js + fotos). Descompacte, envie os arquivos no GitHub em "Add file → Upload files" e faça o commit.'
+    : 'Pacote baixado (só o data.js). Envie o arquivo no GitHub em "Add file → Upload files" e faça o commit.', 'ok');
+};
+
 $('exp').onclick = () => {
   const txt = 'window.IMOVEIS_PADRAO = ' + JSON.stringify(imoveis,null,2) + ';\n';
   baixar('data.js', txt, 'text/javascript');
