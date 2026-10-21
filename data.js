@@ -1,5 +1,18 @@
 window.IMOVEIS_PADRAO = [
   {
+    "titulo": "Teste automatico 1792616590093",
+    "tipo": "Casa",
+    "local": "Teste automatico",
+    "preco": "R$ 1.000.000",
+    "quartos": "3",
+    "banheiros": "2",
+    "area": "100",
+    "descricao": "",
+    "vendido": false,
+    "fotos": [],
+    "id": 1792616590095
+  },
+  {
     "titulo": "apartamento stiep",
     "tipo": "Apartamento",
     "local": "stiep",
