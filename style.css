@@ -118,6 +118,8 @@ footer a:hover{color:var(--gold)}
 input,select,textarea{width:100%;padding:13px 16px;border:1px solid #ddd3c3;border-radius:12px;font-family:inherit;font-size:15px;background:#fff;margin-top:6px}
 input[type=checkbox]{width:auto;height:19px;padding:0;margin:0;accent-color:var(--gold);flex:0 0 auto;cursor:pointer}
 label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:16px;text-align:left}
+label.check{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #e6ddcd;border-radius:12px;background:#faf7f1;margin-bottom:16px;cursor:pointer}
+label.check input[type=checkbox]{margin:0}
 .err{color:#b42318;font-size:14px;min-height:20px;margin:6px 0}
 .topbar{background:var(--navy);color:#fff}
 .topbar .container{display:flex;justify-content:space-between;align-items:center;height:70px}
