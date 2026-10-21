@@ -1,3 +1,6 @@
+(function(){
+try {
+
 const SENHA_PADRAO = '123';
 const $ = id => document.getElementById(id);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -179,7 +182,11 @@ $('form').onsubmit = e => {
   else imoveis.unshift({...d, id: Date.now()});
   if(!salvar()){ imoveis = JSON.parse(antes); render(); return; }
   limpar(); render();
-  toast(editando ? 'Imóvel atualizado.' : 'Imóvel salvo neste navegador. Clique em "Publicar no site" para que todos os visitantes vejam.', 'ok');
+  if(cfgPub().token && cfgPub().repo){
+    publicar();
+  } else {
+    toast('Imóvel salvo. Agora publique para o site ficar visível para todos.', 'ok', 'Publicar', () => abrirPublicar());
+  }
 };
 
 function cfgPub(){ try { return JSON.parse(localStorage.getItem(CHAVE_PUB) || '{}'); } catch { return {}; } }
@@ -243,20 +250,28 @@ async function publicar(){
     salvarCfgPub(cfg);
     toast('Publicado! O site atualiza em instantes (1–2 min).', 'ok');
   } catch(e){
-    toast('Falha ao publicar: ' + e.message, 'erro');
+    const m = String(e && e.message || e);
+    let dica = m;
+    if(/401|Bad credentials/i.test(m)) dica = 'token inválido ou expirado. Gere um novo token no GitHub.';
+    else if(/403|Forbidden/i.test(m)) dica = 'o token não tem permissão de escrita neste repositório.';
+    else if(/404|Not Found/i.test(m)) dica = 'repositório ou branch não encontrado. Confira o nome e a branch.';
+    else if(/401|403/.test(m)) dica = 'permissão negada pelo GitHub.';
+    toast('Não foi possível publicar: ' + dica, 'erro');
   } finally {
     btn.disabled = false; btn.textContent = 'Publicar no site';
     atualizarStatus();
   }
 }
-$('pub').onclick = () => {
+function abrirPublicar(){
   const cfg = cfgPub();
   $('pubRepo').value = cfg.repo || REPO_PADRAO;
   $('pubBranch').value = cfg.branch || 'main';
   $('pubToken').value = cfg.token || '';
   $('pubErr').textContent = '';
   $('modalPub').classList.add('open');
-};
+  $('pubToken').focus();
+}
+$('pub').onclick = abrirPublicar;
 $('cancelPub').onclick = () => $('modalPub').classList.remove('open');
 $('modalPub').onclick = e => { if(e.target === $('modalPub')) $('modalPub').classList.remove('open'); };
 $('fPub').onsubmit = e => {
@@ -277,7 +292,10 @@ $('exp').onclick = () => {
   const txt = 'window.IMOVEIS_PADRAO = ' + JSON.stringify(imoveis,null,2) + ';\n';
   baixar('data.js', txt, 'text/javascript');
   try { navigator.clipboard.writeText(txt); } catch {}
-  toast('data.js baixado e copiado. Substitua o arquivo no repositório para publicar.', 'ok');
+  const temFoto = imoveis.some(i => (i.fotos||[]).some(f => String(f).startsWith('data:')));
+  toast(temFoto
+    ? 'data.js baixado e copiado, mas ele ficou grande por causa das fotos. Nesse caso use "Publicar no site" (com token): as fotos vão como arquivos.'
+    : 'data.js baixado e copiado. No GitHub, abra o arquivo data.js, cole o conteúdo e clique em "Commit changes". A Vercel publica em instantes.', 'ok');
 };
 $('bkp').onclick = () => baixar('imoveis-backup.json', JSON.stringify(imoveis), 'application/json');
 $('imp').onchange = e => { const r=new FileReader(); r.onload=()=>{ try{ const v=JSON.parse(r.result); if(!Array.isArray(v)) throw 0; imoveis=normalizar(v); salvar(); render(); toast('Backup restaurado!', 'ok'); }catch{ toast('Arquivo inválido.', 'erro'); } }; r.readAsText(e.target.files[0]); };
@@ -296,3 +314,12 @@ window.addEventListener('pageshow', limparSenha);
 window.addEventListener('load', () => setTimeout(limparSenha, 400));
 
 if(sessionStorage.getItem('oscar_auth')==='1') entrar();
+
+} catch(e){
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#b42318;color:#fff;padding:14px 18px;font:13px/1.5 monospace;z-index:9999;white-space:pre-wrap';
+  d.textContent = 'Erro no painel: ' + (e && e.message ? e.message : e);
+  document.body.appendChild(d);
+  console.error(e);
+}
+})();

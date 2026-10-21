@@ -46,12 +46,11 @@
         <label class="sm" style="margin:0;font-weight:400">Restaurar backup<input type="file" id="imp" accept=".json" style="display:none"></label>
         <button class="sm" id="rst">Restaurar lista padrão</button>
       </div>
-      <p style="color:var(--muted);font-size:13px;margin-top:14px" id="pubDica">Os imóveis ficam salvos neste navegador. Clique em <b>Publicar no site</b> para que eles apareçam para todos os visitantes.</p>
+      <p style="color:var(--muted);font-size:13px;margin-top:14px" id="pubDica">Os imóveis ficam salvos neste navegador. Para que <b>todos os visitantes</b> vejam, clique em <b>Publicar no site</b>: é só configurar o token do GitHub uma vez e, dali em diante, todo imóvel salvo vai para o site sozinho.</p>
     </div>
   </div>
 </div>
 <script src="data.js?v=20261021"></script>
-<script src="admin.js?v=20261021"></script>
 
 <div class="modal" id="modalExcluir">
   <div class="modal-box" style="max-width:480px">
@@ -68,20 +67,26 @@
 <div class="modal" id="modalPub">
   <div class="modal-box" style="max-width:540px">
     <h2>Publicar no site</h2>
+    <p style="color:var(--muted);font-size:14px;margin:-6px 0 18px">É só configurar uma vez. Depois de salvar um imóvel, ele vai para o site sozinho (a Vercel publica em 1–2 minutos).</p>
     <form id="fPub" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
-      <label style="text-align:left">Repositório (GitHub)<input id="pubRepo" placeholder="gustavomayan113-lang/oscar-corretor"></label>
-      <label style="text-align:left">Branch<input id="pubBranch" placeholder="main"></label>
-      <label style="text-align:left">Token do GitHub<input id="pubToken" type="password" placeholder="github_pat_..."></label>
-      <p style="color:var(--muted);font-size:13px;margin:0">O token fica salvo apenas neste navegador. No GitHub: Settings → Developer settings → Personal access tokens → Fine-grained, com permissão <b>Contents: read and write</b> no repositório. A Vercel publica sozinha em instantes, desde que o projeto esteja conectado ao repositório (Vercel → Project → Settings → Git). Se não estiver, use <b>Exportar data.js</b> e envie o arquivo pelo painel da Vercel.</p>
+      <label style="text-align:left">1. Repositório (GitHub)<input id="pubRepo" placeholder="gustavomayan113-lang/oscar-corretor"></label>
+      <label style="text-align:left">2. Branch<input id="pubBranch" placeholder="main"></label>
+      <label style="text-align:left">3. Token do GitHub<input id="pubToken" type="password" autocomplete="off" placeholder="github_pat_..."></label>
+      <p style="color:var(--muted);font-size:13px;margin:0">Para criar o token: no GitHub, abra <b>Settings → Developer settings → Personal access tokens → Tokens (classic) → Generate new token</b>, marque a caixa <b>repo</b> e copie o código que aparecer. Cole aqui embaixo. Ele fica salvo só neste navegador e só serve para escrever os imóveis neste repositório.</p>
       <div class="err" id="pubErr" style="text-align:left"></div>
       <div class="del-acoes">
         <button type="button" class="sm" id="cancelPub" style="width:auto">Fechar</button>
-        <button type="submit" class="btn btn-gold" style="width:auto">Salvar e publicar</button>
+        <button type="submit" class="btn btn-gold" style="width:auto">Publicar agora</button>
       </div>
+      <p style="color:var(--muted);font-size:12px;margin:0">Sem token? Use o botão <b>Exportar data.js</b>: ele baixa o arquivo e você substitui o <b>data.js</b> no repositório do GitHub — a Vercel publica em seguida.</p>
+    </form>
+  </div>
+</div>
     </form>
   </div>
 </div>
 
 <div class="toast" id="toast"><span id="toastMsg"></span><button class="sm" id="toastAcao" type="button" style="display:none">Desfazer</button></div>
+<script src="admin.js?v=20261021"></script>
 </body>
 </html>
