@@ -7,3 +7,6 @@ build/
 .env
 .env.local
 *.backup.json
+
+.vercel
+.env*

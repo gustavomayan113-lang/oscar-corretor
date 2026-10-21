@@ -6,6 +6,8 @@ const $ = id => document.getElementById(id);
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const CHAVE = 'oscar_imoveis';
 const CHAVE_PUB = 'oscar_publicar';
+const CHAVE_SESS = 'oscar_chave';
+const API = '/api/publish';
 const CAMPOS = ['titulo','tipo','local','preco','quartos','banheiros','area','descricao','vendido'];
 const REPO_PADRAO = 'gustavomayan113-lang/oscar-corretor';
 const PASTA_FOTOS = 'imagens';
@@ -45,11 +47,40 @@ if(senhaEl){
 }
 
 function entrar(){ $('login').style.display='none'; $('app').style.display='block'; render(); }
-$('fLogin').onsubmit = e => {
+function chave(){
+  try { return localStorage.getItem(CHAVE_SESS) || sessionStorage.getItem(CHAVE_SESS) || ''; }
+  catch { return ''; }
+}
+function guardarChave(c){
+  try { localStorage.setItem(CHAVE_SESS, c); sessionStorage.setItem(CHAVE_SESS, c); } catch {}
+}
+function limparChave(){
+  try { localStorage.removeItem(CHAVE_SESS); sessionStorage.removeItem(CHAVE_SESS); } catch {}
+}
+async function pedirChave(senha){
+  try{
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ acao:'chave', senha }) });
+    if(r.status === 401) return { ok:false, erro:'Senha incorreta.' };
+    const j = await r.json().catch(()=>({}));
+    if(r.ok && j.chave){ guardarChave(j.chave); return { ok:true }; }
+    return { ok:false, erro:'O servidor de publicação respondeu errado. Tente de novo.' };
+  }catch{ return { ok:false, semServidor:true }; }
+}
+$('fLogin').onsubmit = async e => {
   e.preventDefault();
   const v = String(digitado !== null ? digitado : ($('senha').value || '')).trim();
-  if(v === senhaAtual()){ sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; digitado=null; $('err').textContent=''; entrar(); }
-  else { $('err').textContent = 'Senha incorreta.'; $('senha').value=''; digitado=null; }
+  $('err').textContent = '';
+  const r = await pedirChave(v);
+  if(r.ok){
+    sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; digitado=null; entrar(); return;
+  }
+  if(r.semServidor && v === senhaAtual()){
+    sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; digitado=null; entrar();
+    toast('Sem conexão com o servidor: o que você salvar fica só neste navegador.', 'erro');
+    return;
+  }
+  $('err').textContent = r.erro || 'Senha incorreta.';
+  $('senha').value=''; digitado=null;
 };
 $('sair').onclick = () => { sessionStorage.removeItem('oscar_auth'); location.href = 'index.html'; };
 
@@ -93,7 +124,7 @@ function render(){
     document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
       const id = +b.dataset.v;
       imoveis = imoveis.map(i => i.id===id ? {...i, vendido: !i.vendido} : i);
-      salvar(); render();
+      salvar(); render(); publicarAuto();
     });
   } catch(e){
     $('list').innerHTML = `<p class="vazio">Erro ao listar os imóveis: ${esc(e.message)}</p>`;
@@ -154,6 +185,7 @@ function excluir(){
   salvar(); render();
   fecharExcluir();
   toast('"' + (removido.imovel.titulo||'Imóvel') + '" foi excluído.', 'erro', 'Desfazer', desfazer);
+  publicarAuto();
 }
 function desfazer(){
   if(!removido) return;
@@ -163,6 +195,7 @@ function desfazer(){
   removido = null;
   salvar(); render();
   toast('"' + (nome||'Imóvel') + '" voltou para a lista.', 'ok');
+  publicarAuto();
 }
 $('cancelExcluir').onclick = fecharExcluir;
 $('modalExcluir').onclick = e => { if(e.target === $('modalExcluir')) fecharExcluir(); };
@@ -182,22 +215,67 @@ $('form').onsubmit = e => {
   else imoveis.unshift({...d, id: Date.now()});
   if(!salvar()){ imoveis = JSON.parse(antes); render(); return; }
   limpar(); render();
-  if(cfgPub().token && cfgPub().repo){
-    publicar();
-  } else {
-    toast('Imóvel salvo. Agora publique para o site ficar visível para todos.', 'ok', 'Publicar', () => abrirPublicar());
-  }
+  publicarAuto();
 };
 
 function cfgPub(){ try { return JSON.parse(localStorage.getItem(CHAVE_PUB) || '{}'); } catch { return {}; } }
 function salvarCfgPub(c){ localStorage.setItem(CHAVE_PUB, JSON.stringify(c)); }
+let pub = { estado:'idle', erro:'' };
 function atualizarStatus(){
-  const cfg = cfgPub();
   const s = $('pubStatus');
-  if(!cfg.repo || !cfg.token){ s.innerHTML = '<span class="dot wait"></span>Publicação não configurada — os imóveis ficam só neste navegador.'; return; }
-  if(cfg.ultimo && cfg.ultimo !== checksum(JSON.stringify(imoveis))){ s.innerHTML = '<span class="dot wait"></span>Há alterações ainda não publicadas no site.'; return; }
-  if(cfg.em){ s.innerHTML = '<span class="dot ok"></span>Publicado em ' + esc(new Date(cfg.em).toLocaleString('pt-BR')) + '.'; return; }
-  s.innerHTML = '<span class="dot wait"></span>Pronto para publicar.';
+  if(!s) return;
+  const cfg = cfgPub();
+  const atual = checksum(JSON.stringify(imoveis));
+  let html;
+  if(!chave()){
+    html = '<span class="dot wait"></span>Publicação automática indisponível neste navegador.';
+  } else if(pub.estado === 'publicando'){
+    html = '<span class="dot wait"></span>Publicando no site…';
+  } else if(pub.estado === 'erro'){
+    html = '<span class="dot erro"></span>Não foi possível publicar: ' + esc(pub.erro);
+  } else if(cfg.ultimo && cfg.ultimo !== atual){
+    html = '<span class="dot wait"></span>Tem alteração ainda não publicada no site.';
+  } else if(cfg.em){
+    html = '<span class="dot ok"></span>No ar — publicado em ' + esc(new Date(cfg.em).toLocaleString('pt-BR')) + '.';
+  } else {
+    html = '<span class="dot wait"></span>Pronto para publicar.';
+  }
+  s.innerHTML = html + ' <button class="sm" id="pubTentar" type="button">' + (pub.estado === 'erro' ? 'Tentar de novo' : 'Publicar agora') + '</button>';
+  const b = $('pubTentar');
+  if(b) b.onclick = () => publicarAuto();
+}
+async function publicarAuto(){
+  if(!chave()){
+    toast('Publicação automática indisponível. Abra o painel pelo site e entre com a senha.', 'erro');
+    atualizarStatus(); return;
+  }
+  pub = { estado:'publicando', erro:'' }; atualizarStatus();
+  const mapa = nomesFotos();
+  const fotos = {};
+  for(const im of imoveis){
+    (im.fotos||[]).forEach((f,k)=>{
+      if(typeof f === 'string' && f.startsWith('data:')) fotos[mapa[im.id][k]] = f.slice(f.indexOf(',')+1);
+    });
+  }
+  try{
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json','x-publish-key':chave()}, body: JSON.stringify({ imoveis: imoveis.map(im=>({...im, fotos: mapa[im.id]})), fotos }) });
+    const j = await r.json().catch(()=>({}));
+    if(r.status === 401){
+      limparChave(); sessionStorage.removeItem('oscar_auth');
+      $('app').style.display='none'; $('login').style.display='block';
+      throw new Error('sua sessão expirou — entre com a senha de novo.');
+    }
+    if(!r.ok || !j.ok) throw new Error(j.erro || ('HTTP ' + r.status));
+    const cfg = cfgPub();
+    cfg.publicados = mapa; cfg.ultimo = checksum(JSON.stringify(imoveis)); cfg.em = Date.now();
+    salvarCfgPub(cfg);
+    pub = { estado:'idle', erro:'' };
+    toast('Publicado no site! Fica no ar em instantes (1–2 min).', 'ok');
+  }catch(e){
+    pub = { estado:'erro', erro: String(e && e.message || e) };
+    toast('O imóvel ficou salvo aqui, mas a publicação falhou: ' + pub.erro, 'erro', 'Tentar de novo', () => publicarAuto());
+  }
+  atualizarStatus();
 }
 async function putFile(repo, branch, path, contentB64, token){
   const url = 'https://api.github.com/repos/' + repo + '/contents/' + path.split('/').map(encodeURIComponent).join('/');
@@ -292,8 +370,8 @@ function fazerZip(arquivos){
 async function publicar(){
   const cfg = cfgPub();
   if(!cfg.repo || !cfg.token){ $('pubErr').textContent = 'Preencha o repositório e o token.'; $('modalPub').classList.add('open'); return; }
-  const btn = $('pub');
-  btn.disabled = true; btn.textContent = 'Publicando…';
+  const btn = document.querySelector('#fPub button[type="submit"]');
+  if(btn){ btn.disabled = true; btn.textContent = 'Publicando…'; }
   try {
     const publicados = cfg.publicados || {};
     const checks = cfg.checks || {};
@@ -318,6 +396,7 @@ async function publicar(){
     cfg.ultimo = checksum(JSON.stringify(imoveis));
     cfg.em = Date.now();
     salvarCfgPub(cfg);
+    pub = { estado:'idle', erro:'' };
     toast('Publicado! O site atualiza em instantes (1–2 min).', 'ok');
   } catch(e){
     const m = String(e && e.message || e);
@@ -328,7 +407,7 @@ async function publicar(){
     else if(/401|403/.test(m)) dica = 'permissão negada pelo GitHub.';
     toast('Não foi possível publicar: ' + dica, 'erro');
   } finally {
-    btn.disabled = false; btn.textContent = 'Publicar no site';
+    if(btn){ btn.disabled = false; btn.textContent = 'Publicar agora'; }
     atualizarStatus();
   }
 }
@@ -341,7 +420,8 @@ function abrirPublicar(){
   $('modalPub').classList.add('open');
   $('pubToken').focus();
 }
-$('pub').onclick = abrirPublicar;
+$('pub').onclick = () => publicarAuto();
+$('pubManual').onclick = abrirPublicar;
 $('cancelPub').onclick = () => $('modalPub').classList.remove('open');
 $('modalPub').onclick = e => { if(e.target === $('modalPub')) $('modalPub').classList.remove('open'); };
 $('fPub').onsubmit = e => {
@@ -394,11 +474,12 @@ $('exp').onclick = () => {
     : 'data.js baixado e copiado. No GitHub, abra o arquivo data.js, cole o conteúdo e clique em "Commit changes". A Vercel publica em instantes.', 'ok');
 };
 $('bkp').onclick = () => baixar('imoveis-backup.json', JSON.stringify(imoveis), 'application/json');
-$('imp').onchange = e => { const r=new FileReader(); r.onload=()=>{ try{ const v=JSON.parse(r.result); if(!Array.isArray(v)) throw 0; imoveis=normalizar(v); salvar(); render(); toast('Backup restaurado!', 'ok'); }catch{ toast('Arquivo inválido.', 'erro'); } }; r.readAsText(e.target.files[0]); };
+$('imp').onchange = e => { const r=new FileReader(); r.onload=()=>{ try{ const v=JSON.parse(r.result); if(!Array.isArray(v)) throw 0; imoveis=normalizar(v); salvar(); render(); toast('Backup restaurado!', 'ok'); publicarAuto(); }catch{ toast('Arquivo inválido.', 'erro'); } }; r.readAsText(e.target.files[0]); };
 $('rst').onclick = () => {
   if(!confirm('Substituir a lista atual pelos imóveis padrão do site?')) return;
   imoveis = normalizar(listaPadrao()); salvar(); render();
   toast('Lista restaurada com os imóveis padrão.', 'ok');
+  publicarAuto();
 };
 
 window.addEventListener('storage', e => { if(e.key === CHAVE){ imoveis = carregar(); render(); } });
@@ -409,7 +490,7 @@ function limparSenha(){ const s = $('senha'); if(s) s.value=''; digitado = null;
 window.addEventListener('pageshow', limparSenha);
 window.addEventListener('load', () => setTimeout(limparSenha, 400));
 
-if(sessionStorage.getItem('oscar_auth')==='1') entrar();
+if(sessionStorage.getItem('oscar_auth')==='1' || chave()) entrar();
 
 } catch(e){
   const d = document.createElement('div');

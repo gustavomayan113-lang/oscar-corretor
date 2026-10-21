@@ -104,7 +104,7 @@ label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bott
 .tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center}
 .tools .sm,.tools label.sm{margin-left:0}
 .btn.compact{padding:10px 20px;font-size:13px}
-.pub-status{display:flex;align-items:center;gap:9px;margin-top:18px;font-size:13px;color:var(--muted);background:#faf7f1;border:1px solid #ece3d4;border-radius:12px;padding:11px 14px;line-height:1.4}
+.pub-status{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:18px;font-size:13px;color:var(--muted);background:#faf7f1;border:1px solid #ece3d4;border-radius:12px;padding:11px 14px;line-height:1.4}
 .pub-status .dot{width:9px;height:9px;border-radius:50%;background:#c9a45c;flex:0 0 auto}
 .pub-status .dot.ok{background:#2e7d32}
 .pub-status .dot.erro{background:#b42318}

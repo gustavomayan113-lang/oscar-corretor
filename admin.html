@@ -13,7 +13,7 @@
   <label>Senha<input type="password" id="senha" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus></label>
   <div class="err" id="err"></div>
   <button class="btn btn-gold" style="width:100%">Entrar</button>
-  <p class="login-dica">Senha: <b>123</b></p>
+  <p class="login-dica">Acesso restrito ao responsável pelo site</p>
   <p style="margin-top:18px"><a href="index.html" style="color:var(--muted);font-size:14px">← Voltar ao site</a></p>
 </form></div>
 
@@ -40,13 +40,22 @@
       <div class="list" id="list"></div>
       <div class="pub-status" id="pubStatus"></div>
       <div class="tools">
-        <button class="btn btn-gold compact" id="pub">Publicar no site</button>
+        <button class="btn btn-gold compact" id="pub">Publicar agora</button>
         <button class="sm" id="exp">Exportar data.js</button>
         <button class="sm" id="bkp">Baixar backup (.json)</button>
         <label class="sm" style="margin:0;font-weight:400">Restaurar backup<input type="file" id="imp" accept=".json" style="display:none"></label>
         <button class="sm" id="rst">Restaurar lista padrão</button>
       </div>
-      <p style="color:var(--muted);font-size:13px;margin-top:14px" id="pubDica">Os imóveis ficam salvos neste navegador. Para que <b>todos os visitantes</b> vejam, clique em <b>Publicar no site</b>: é só configurar o token do GitHub uma vez e, dali em diante, todo imóvel salvo vai para o site sozinho.</p>
+      <p style="color:var(--muted);font-size:13px;margin-top:14px" id="pubDica">É só preencher o formulário e clicar em <b>Salvar imóvel</b>: o anúncio vai para o site sozinho, em 1–2 minutos. Não precisa mexer em token, repositório nem GitHub — o site se vira sozinho.</p>
+      <details style="margin-top:16px">
+        <summary style="cursor:pointer;color:var(--muted);font-size:13px">Publicação manual (uso técnico)</summary>
+        <div class="tools" style="margin-top:10px">
+          <button class="sm" id="pubManual">Publicar com token</button>
+          <button class="sm" id="abrirGithub">Abrir o data.js no GitHub</button>
+          <button class="sm" id="baixarPacote">Baixar pacote com as fotos</button>
+        </div>
+        <p style="color:var(--muted);font-size:13px">Só use se a publicação automática estiver fora do ar.</p>
+      </details>
     </div>
   </div>
 </div>
