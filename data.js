@@ -1,5 +1,20 @@
 window.IMOVEIS_PADRAO = [
   {
+    "titulo": "casa stiep das casas",
+    "tipo": "Casa",
+    "local": "stiep das casas",
+    "preco": "10000000",
+    "quartos": "5",
+    "banheiros": "4",
+    "area": "400",
+    "descricao": "teste da casa do stiep das casas",
+    "vendido": false,
+    "fotos": [
+      "imagens/casa-stiep-das-casas-1792617098016-1.jpg"
+    ],
+    "id": 1792617098016
+  },
+  {
     "titulo": "apartamento barra",
     "tipo": "Apartamento",
     "local": "barra",
