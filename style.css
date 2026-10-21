@@ -72,6 +72,7 @@ footer a:hover{color:var(--gold)}
 .login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(14,26,43,.88),rgba(14,26,43,.95)),url(hero.jpg) center/cover}
 .login form{background:#fff;padding:48px;border-radius:var(--r);width:100%;max-width:400px;text-align:center}
 .login h1{font-size:36px;color:var(--navy)}
+.login-dica{color:var(--muted);font-size:13px;margin-top:16px;text-align:center}
 input,select,textarea{width:100%;padding:13px 16px;border:1px solid #ddd3c3;border-radius:12px;font-family:inherit;font-size:15px;background:#fff;margin-top:6px}
 label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:16px;text-align:left}
 .err{color:#b42318;font-size:14px;min-height:20px;margin:6px 0}

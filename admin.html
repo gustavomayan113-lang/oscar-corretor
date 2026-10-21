@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel | Corretor Oscar</title><meta name="robots" content="noindex">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261021">
 </head>
 <body class="admin">
 <div class="login" id="login"><form id="fLogin" autocomplete="off">
@@ -13,14 +13,13 @@
   <label>Senha<input type="password" id="senha" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus></label>
   <div class="err" id="err"></div>
   <button class="btn btn-gold" style="width:100%">Entrar</button>
-  <button type="button" class="sm" id="usarPadrao" style="width:100%;margin:10px 0 0">Entrar com a senha padrão (123)</button>
-  <p style="color:var(--muted);font-size:13px;margin-top:16px">Senha padrão: <b>123</b>. O navegador não guarda a senha digitada.</p>
+  <p class="login-dica">Senha: <b>123</b></p>
   <p style="margin-top:18px"><a href="index.html" style="color:var(--muted);font-size:14px">← Voltar ao site</a></p>
 </form></div>
 
 <div id="app" style="display:none">
   <div class="topbar"><div class="container"><div class="logo">Corretor <span>Oscar</span> · Painel</div>
-    <div><a href="index.html" target="_blank" class="sm">Ver site</a><button class="sm" id="sair">Sair</button><button class="sm btn-gold" id="btnTrocarSenha" style="margin-left:6px">Alterar senha</button></div></div></div>
+    <div><a href="index.html" target="_blank" class="sm">Ver site</a><button class="sm" id="sair">Sair</button></div></div></div>
   <div class="container panel">
     <form class="box" id="form">
       <h2 id="ftitle">Novo imóvel</h2>
@@ -51,24 +50,8 @@
     </div>
   </div>
 </div>
-<script src="data.js"></script>
-<script src="admin.js"></script>
-
-<div class="modal" id="modalSenha">
-  <div class="modal-box" style="max-width:460px">
-    <h2>Alterar senha</h2>
-    <p style="color:var(--muted);font-size:13px;margin:-8px 0 18px">A nova senha vale só enquanto este navegador estiver aberto. Nada é gravado no computador.</p>
-    <form id="fTrocaSenha" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
-      <label style="text-align:left">Senha atual<input type="password" id="senhaAtual" autocomplete="new-password" autocapitalize="off" spellcheck="false" required></label>
-      <label style="text-align:left">Nova senha<input type="password" id="novaSenha" autocomplete="new-password" autocapitalize="off" spellcheck="false" required minlength="4"></label>
-      <label style="text-align:left">Confirmar nova senha<input type="password" id="confirmaSenha" autocomplete="new-password" autocapitalize="off" spellcheck="false" required></label>
-      <div class="err" id="errSenha" style="text-align:left"></div>
-      <button type="button" class="sm" id="cancelSenha" style="width:auto">Cancelar</button>
-      <button type="button" class="sm" id="btnRedefinir123" style="width:auto">Voltar para a senha padrão (123)</button>
-      <button type="submit" class="btn btn-gold" style="width:auto">Salvar senha</button>
-    </form>
-  </div>
-</div>
+<script src="data.js?v=20261021"></script>
+<script src="admin.js?v=20261021"></script>
 
 <div class="modal" id="modalExcluir">
   <div class="modal-box" style="max-width:480px">

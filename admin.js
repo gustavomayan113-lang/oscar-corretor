@@ -8,7 +8,7 @@ const REPO_PADRAO = 'gustavomayan113-lang/oscar-corretor';
 const PASTA_FOTOS = 'imagens';
 const LIMITE_FOTO = 900000;
 
-function senhaAtual(){ return sessionStorage.getItem('oscar_senha') || SENHA_PADRAO; }
+function senhaAtual(){ return SENHA_PADRAO; }
 function listaPadrao(){ return [...(window.IMOVEIS_PADRAO||[])]; }
 let seq = 0;
 function normalizar(l){
@@ -33,6 +33,22 @@ let editId = null;
 let idExcluir = null;
 let removido = null;
 let timerToast = null;
+let digitado = null;
+
+const senhaEl = $('senha');
+if(senhaEl){
+  senhaEl.addEventListener('keyup', () => { digitado = senhaEl.value; });
+  senhaEl.addEventListener('paste', () => setTimeout(() => { digitado = senhaEl.value; }, 0));
+}
+
+function entrar(){ $('login').style.display='none'; $('app').style.display='block'; render(); }
+$('fLogin').onsubmit = e => {
+  e.preventDefault();
+  const v = String(digitado !== null ? digitado : ($('senha').value || '')).trim();
+  if(v === senhaAtual()){ sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; digitado=null; $('err').textContent=''; entrar(); }
+  else { $('err').textContent = 'Senha incorreta.'; $('senha').value=''; digitado=null; }
+};
+$('sair').onclick = () => { sessionStorage.removeItem('oscar_auth'); location.href = 'index.html'; };
 
 function toast(msg, tipo, acao, fn){
   const t = $('toast');
@@ -271,50 +287,11 @@ $('rst').onclick = () => {
   toast('Lista restaurada com os imóveis padrão.', 'ok');
 };
 
-function entrar(){ $('login').style.display='none'; $('app').style.display='block'; render(); }
-$('fLogin').onsubmit = e => {
-  e.preventDefault();
-  const v = String($('senha').value || '').trim();
-  if(v && v === senhaAtual()){ sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; entrar(); }
-  else { $('err').textContent = 'Senha incorreta. Use 123 ou clique em "Entrar com a senha padrão (123)".'; $('senha').value=''; }
-};
-$('usarPadrao').onclick = () => {
-  sessionStorage.setItem('oscar_senha', SENHA_PADRAO);
-  sessionStorage.setItem('oscar_auth','1');
-  $('senha').value=''; $('err').textContent='';
-  entrar();
-};
-$('sair').onclick = () => { sessionStorage.removeItem('oscar_auth'); location.href = 'index.html'; };
-
-const modalSenha = $('modalSenha');
-$('btnTrocarSenha').onclick = () => { modalSenha.classList.add('open'); $('senhaAtual').value=''; $('novaSenha').value=''; $('confirmaSenha').value=''; $('senhaAtual').focus(); $('errSenha').textContent=''; };
-$('cancelSenha').onclick = () => { modalSenha.classList.remove('open'); };
-modalSenha.onclick = e => { if(e.target===modalSenha) modalSenha.classList.remove('open'); };
-$('fTrocaSenha').onsubmit = e => {
-  e.preventDefault();
-  const atual = $('senhaAtual').value;
-  const nova = $('novaSenha').value;
-  const conf = $('confirmaSenha').value;
-  if(nova !== conf){ $('errSenha').textContent = 'As senhas não conferem.'; return; }
-  if(atual !== senhaAtual()){ $('errSenha').textContent = 'Senha atual incorreta.'; return; }
-  sessionStorage.setItem('oscar_senha', nova);
-  modalSenha.classList.remove('open');
-  toast('Senha alterada para esta sessão. Nada foi gravado no navegador.', 'ok');
-};
-$('btnRedefinir123').onclick = () => {
-  sessionStorage.setItem('oscar_senha', SENHA_PADRAO);
-  sessionStorage.removeItem('oscar_auth');
-  modalSenha.classList.remove('open');
-  $('login').style.display='block'; $('app').style.display='none';
-  $('senha').value=''; $('err').textContent='';
-  toast('A senha do painel voltou a ser 123.', 'ok');
-};
-
 window.addEventListener('storage', e => { if(e.key === CHAVE){ imoveis = carregar(); render(); } });
 
-try { localStorage.removeItem('oscar_pwd'); } catch {}
+try { localStorage.removeItem('oscar_pwd'); sessionStorage.removeItem('oscar_senha'); } catch {}
 
-function limparSenha(){ const s = $('senha'); if(s) s.value=''; }
+function limparSenha(){ const s = $('senha'); if(s) s.value=''; digitado = null; }
 window.addEventListener('pageshow', limparSenha);
 window.addEventListener('load', () => setTimeout(limparSenha, 400));
 
