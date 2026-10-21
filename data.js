@@ -1,5 +1,3 @@
-// Imoveis padrao (aparecem para todos os visitantes).
-// Gerado pelo painel administrativo em 2026-10-21.
 window.IMOVEIS_PADRAO = [
   {
     "titulo": "apartamento stiep",
