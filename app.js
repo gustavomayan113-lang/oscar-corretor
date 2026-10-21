@@ -50,7 +50,18 @@ function abrir(id){
 const modal = document.getElementById('modal');
 document.getElementById('close').onclick = () => modal.classList.remove('open');
 modal.onclick = e => { if(e.target===modal) modal.classList.remove('open'); };
-window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY>40));
+const nav = document.getElementById('nav');
+const menu = document.getElementById('menu');
+const menuBtn = document.getElementById('menuBtn');
+function fecharMenu(){ menu.classList.remove('open'); menuBtn.setAttribute('aria-expanded','false'); }
+menuBtn.onclick = () => {
+  const aberto = menu.classList.toggle('open');
+  menuBtn.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+  menuBtn.textContent = aberto ? '✕' : '☰';
+};
+menu.querySelectorAll('a').forEach(a => a.onclick = fecharMenu);
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', scrollY>40); if(scrollY>40) fecharMenu(); });
+window.addEventListener('resize', () => { if(window.innerWidth>800) fecharMenu(); });
 function observe(){
   const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {threshold:.1});
   document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
