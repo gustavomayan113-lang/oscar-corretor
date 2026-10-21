@@ -1,0 +1,9 @@
+node_modules/
+.bun/
+dist/
+build/
+*.log
+.DS_Store
+.env
+.env.local
+*.backup.json

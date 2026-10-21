@@ -1,0 +1,48 @@
+CORRETOR OSCAR - PACOTE COMPLETO
+================================
+
+O QUE TEM AQUI
+--------------
+site/      -> O site pronto. É só esta pasta que você precisa para publicar.
+projeto/   -> O código completo do projeto (o que roda no Lovable). Não é
+              necessário para colocar o site no ar; está aqui como backup.
+LEIA-ME.txt-> Este arquivo.
+
+A PASTA site/ CONTÉM
+-------------------
+index.html    -> a página do site (abertura, lista de imóveis, contato)
+admin.html    -> o painel administrativo (troca de imóveis e fotos)
+style.css     -> todas as cores, fontes e layouts
+app.js        -> a lógica do site (lista, filtros, galeria)
+admin.js      -> a lógica do painel (senha, cadastro, exportar)
+data.js       -> os imóveis que aparecem para todo visitante
+*.jpg         -> as fotos (hero.jpg é a foto de abertura)
+
+COMO PUBLICAR
+-------------
+1. Tenha uma hospedagem (Hostinger, Locaweb, Netlify, Vercel, GitHub Pages...).
+2. Envie o CONTEÚDO da pasta site/ para a pasta pública da hospedagem
+   (costuma chamar public_html, www ou dist).
+3. O site abre em http://seusite.com.br  e o painel em
+   http://seusite.com.br/admin.html
+
+COMO ENTRAR NO PAINEL
+---------------------
+Abra admin.html e digite a senha: oscar2026
+Para trocar a senha: acesse https://emn178.github.io/online-tools/sha256.html,
+digite a nova senha, copie o código gerado e substitua o valor de SENHA_HASH
+na linha 2 do arquivo admin.js.
+
+COMO ADICIONAR IMÓVEIS
+----------------------
+Pelo painel: entrar, preencher o formulário, escolher as fotos e salvar.
+As mudanças ficam salvas no navegador de quem cadastrou. Para que todos vejam,
+clique em "Exportar data.js" e substitua o arquivo data.js da hospedagem pelo
+arquivo baixado.
+
+OBSERVAÇÕES
+-----------
+- Não há banco de dados: os imóveis que todo mundo vê vêm do arquivo data.js.
+- O número de WhatsApp em index.html (5500000000000) e os textos "15+ anos" e
+  "500+ famílias" são provisórios. Troque pelos dados reais.
+- Preços, endereços e medidas dos imóveis de exemplo são fictícios.
