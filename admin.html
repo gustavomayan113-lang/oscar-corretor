@@ -7,12 +7,14 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="admin">
-<div class="login" id="login"><form id="fLogin">
+<div class="login" id="login"><form id="fLogin" autocomplete="off">
   <div class="logo" style="color:var(--navy)">Corretor <span>Oscar</span></div>
   <h1>Painel administrativo</h1><p style="color:var(--muted);margin-bottom:24px">Digite a senha para continuar</p>
-  <label>Senha<input type="password" id="senha" autofocus></label>
+  <label>Senha<input type="password" id="senha" autocomplete="new-password" autocapitalize="off" autocorrect="off" spellcheck="false" autofocus></label>
   <div class="err" id="err"></div>
   <button class="btn btn-gold" style="width:100%">Entrar</button>
+  <button type="button" class="sm" id="usarPadrao" style="width:100%;margin:10px 0 0">Entrar com a senha padrão (123)</button>
+  <p style="color:var(--muted);font-size:13px;margin-top:16px">Senha padrão: <b>123</b>. O navegador não guarda a senha digitada.</p>
   <p style="margin-top:18px"><a href="index.html" style="color:var(--muted);font-size:14px">← Voltar ao site</a></p>
 </form></div>
 
@@ -55,13 +57,14 @@
 <div class="modal" id="modalSenha">
   <div class="modal-box" style="max-width:460px">
     <h2>Alterar senha</h2>
-    <form id="fTrocaSenha" style="padding:24px;display:flex;flex-direction:column;gap:14px">
-      <label style="text-align:left">Senha atual<input type="password" id="senhaAtual" required></label>
-      <label style="text-align:left">Nova senha<input type="password" id="novaSenha" required minlength="4"></label>
-      <label style="text-align:left">Confirmar nova senha<input type="password" id="confirmaSenha" required></label>
+    <p style="color:var(--muted);font-size:13px;margin:-8px 0 18px">A nova senha vale só enquanto este navegador estiver aberto. Nada é gravado no computador.</p>
+    <form id="fTrocaSenha" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <label style="text-align:left">Senha atual<input type="password" id="senhaAtual" autocomplete="new-password" autocapitalize="off" spellcheck="false" required></label>
+      <label style="text-align:left">Nova senha<input type="password" id="novaSenha" autocomplete="new-password" autocapitalize="off" spellcheck="false" required minlength="4"></label>
+      <label style="text-align:left">Confirmar nova senha<input type="password" id="confirmaSenha" autocomplete="new-password" autocapitalize="off" spellcheck="false" required></label>
       <div class="err" id="errSenha" style="text-align:left"></div>
       <button type="button" class="sm" id="cancelSenha" style="width:auto">Cancelar</button>
-      <button type="button" class="sm" id="btnRedefinir123" style="width:auto">Redefinir para 123</button>
+      <button type="button" class="sm" id="btnRedefinir123" style="width:auto">Voltar para a senha padrão (123)</button>
       <button type="submit" class="btn btn-gold" style="width:auto">Salvar senha</button>
     </form>
   </div>

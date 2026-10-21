@@ -8,7 +8,7 @@ const REPO_PADRAO = 'gustavomayan113-lang/oscar-corretor';
 const PASTA_FOTOS = 'imagens';
 const LIMITE_FOTO = 900000;
 
-function senhaAtual(){ return localStorage.getItem('oscar_pwd') || SENHA_PADRAO; }
+function senhaAtual(){ return sessionStorage.getItem('oscar_senha') || SENHA_PADRAO; }
 function listaPadrao(){ return [...(window.IMOVEIS_PADRAO||[])]; }
 let seq = 0;
 function normalizar(l){
@@ -274,8 +274,15 @@ $('rst').onclick = () => {
 function entrar(){ $('login').style.display='none'; $('app').style.display='block'; render(); }
 $('fLogin').onsubmit = e => {
   e.preventDefault();
-  if($('senha').value === senhaAtual()){ sessionStorage.setItem('oscar_auth','1'); entrar(); }
-  else { $('err').textContent = 'Senha incorreta.'; $('senha').value=''; }
+  const v = String($('senha').value || '').trim();
+  if(v && v === senhaAtual()){ sessionStorage.setItem('oscar_auth','1'); $('senha').value=''; entrar(); }
+  else { $('err').textContent = 'Senha incorreta. Use 123 ou clique em "Entrar com a senha padrão (123)".'; $('senha').value=''; }
+};
+$('usarPadrao').onclick = () => {
+  sessionStorage.setItem('oscar_senha', SENHA_PADRAO);
+  sessionStorage.setItem('oscar_auth','1');
+  $('senha').value=''; $('err').textContent='';
+  entrar();
 };
 $('sair').onclick = () => { sessionStorage.removeItem('oscar_auth'); location.href = 'index.html'; };
 
@@ -290,14 +297,25 @@ $('fTrocaSenha').onsubmit = e => {
   const conf = $('confirmaSenha').value;
   if(nova !== conf){ $('errSenha').textContent = 'As senhas não conferem.'; return; }
   if(atual !== senhaAtual()){ $('errSenha').textContent = 'Senha atual incorreta.'; return; }
-  localStorage.setItem('oscar_pwd', nova);
+  sessionStorage.setItem('oscar_senha', nova);
   modalSenha.classList.remove('open');
-  toast('Senha alterada com sucesso!', 'ok');
+  toast('Senha alterada para esta sessão. Nada foi gravado no navegador.', 'ok');
 };
 $('btnRedefinir123').onclick = () => {
-  if(confirm('Redefinir a senha para 123?')){ localStorage.removeItem('oscar_pwd'); toast('Senha redefinida para 123.', 'ok'); }
+  sessionStorage.setItem('oscar_senha', SENHA_PADRAO);
+  sessionStorage.removeItem('oscar_auth');
+  modalSenha.classList.remove('open');
+  $('login').style.display='block'; $('app').style.display='none';
+  $('senha').value=''; $('err').textContent='';
+  toast('A senha do painel voltou a ser 123.', 'ok');
 };
 
 window.addEventListener('storage', e => { if(e.key === CHAVE){ imoveis = carregar(); render(); } });
+
+try { localStorage.removeItem('oscar_pwd'); } catch {}
+
+function limparSenha(){ const s = $('senha'); if(s) s.value=''; }
+window.addEventListener('pageshow', limparSenha);
+window.addEventListener('load', () => setTimeout(limparSenha, 400));
 
 if(sessionStorage.getItem('oscar_auth')==='1') entrar();

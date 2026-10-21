@@ -29,7 +29,11 @@ Na Vercel o projeto precisa ter a raiz do repositório como pasta do site
 COMO ENTRAR NO PAINEL
 ----------------------
 Abra admin.html e digite a senha: 123
-Para trocar a senha: use o botão "Alterar senha" no próprio painel.
+- Se a senha não entrar, clique em "Entrar com a senha padrão (123)".
+- O navegador NÃO guarda a senha: ela é apagada do campo toda vez e nada
+  fica gravado no computador.
+- "Alterar senha" (dentro do painel) só vale enquanto o navegador estiver
+  aberto. Ao fechar, a senha volta a ser 123.
 
 COMO ADICIONAR IMÓVEIS
 ----------------------
@@ -59,7 +63,8 @@ OUTROS BOTÕES DO PAINEL
   site (vendidos não aparecem para os visitantes).
 - "Baixar backup (.json)" / "Restaurar backup": salva e recupera a lista.
 - "Restaurar lista padrão": volta para os imóveis que já vinham no site.
-- "Alterar senha": troca a senha de acesso ao painel.
+- "Alterar senha": troca a senha de acesso ao painel, só nesta sessão
+  (nada é gravado no navegador).
 
 OBSERVAÇÕES
 -----------
