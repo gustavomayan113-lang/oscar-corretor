@@ -1,6 +1,14 @@
 CORRETOR OSCAR - SITE ESTÁTICO (HTML/CSS/JS puro)
 =================================================
 
+ENDEREÇOS
+---------
+Site (público) : https://oscar-corretor-psi.vercel.app
+Painel         : https://oscar-corretor-psi.vercel.app/admin.html
+Repositório    : https://github.com/gustavomayan113-lang/oscar-corretor
+ATENÇÃO: o endereço antigo oscar-corretor.vercel.app foi apagado na Vercel e
+não funciona mais. Use sempre o endereço com "-psi".
+
 ESTRUTURA
 ---------
 Esta pasta contém o site pronto, sem framework. É só esta pasta que você
@@ -71,6 +79,8 @@ OBSERVAÇÕES
 -----------
 - Não há banco de dados: o que todo mundo vê vem do arquivo data.js; o
   painel guarda uma cópia no navegador de quem cadastra.
+- Ou seja: um imóvel só aparece para os visitantes DEPOIS de publicado.
+  Antes disso ele só existe no navegador de quem cadastrou.
 - O número de WhatsApp em index.html (5500000000000) e os textos "15+ anos" e
   "500+ famílias" são provisórios. Troque pelos dados reais.
 - Preços, endereços e medidas dos imóveis de exemplo são fictícios.
