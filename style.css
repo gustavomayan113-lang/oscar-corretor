@@ -90,17 +90,4 @@ label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bott
 .sm{padding:8px 14px;font-size:13px;border-radius:30px;border:1px solid #ddd;background:#fff;cursor:pointer;margin-left:6px}
 .sm.del{color:#b42318;border-color:#f0c4c0}
 .tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-
-/* cards visuais na listagem do admin */
-.admin-card{background:#fff;border-radius:var(--r);border:1px solid #e8e0d4;padding:16px;margin-bottom:14px;display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;box-shadow:0 4px 12px -8px rgba(0,0,0,.08)}
-.admin-card img{width:100%;height:76px;object-fit:cover;border-radius:10px;background:#eee}
-.admin-card .info{display:flex;flex-direction:column;gap:6px}
-.admin-card .info b{color:var(--navy);font-size:17px}
-.admin-card .info .meta{font-size:13px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
-.admin-card .info .meta span{background:#f4efe6;padding:2px 8px;border-radius:20px;font-size:11.5px}
-.admin-card .actions{margin-top:10px;display:flex;gap:8px}
-.admin-card .actions .sm{margin-left:0}
-.admin-card.vendido{opacity:.55;filter:grayscale(.35)}
-.selo-vendido{background:#b42318;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-left:8px}
-.admin-card.vendido .actions .vendido{background:var(--gold);border-color:var(--gold);color:var(--navy)}
 @media(max-width:900px){.panel{grid-template-columns:1fr}}

@@ -3,7 +3,7 @@ function getImoveis(){
   return s ? JSON.parse(s) : (window.IMOVEIS_PADRAO || []);
 }
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const imoveis = getImoveis().filter(i => !i.vendido);
+const imoveis = getImoveis();
 let filtro = 'Todos';
 document.getElementById('ano').textContent = new Date().getFullYear();
 document.getElementById('count').textContent = imoveis.length;

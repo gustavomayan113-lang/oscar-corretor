@@ -1,15 +1,11 @@
-CORRETOR OSCAR - PACOTE COMPLETO
-================================
+CORRETOR OSCAR - SITE ESTÁTICO (HTML/CSS/JS puro)
+=================================================
 
-O QUE TEM AQUI
---------------
-site/      -> O site pronto. É só esta pasta que você precisa para publicar.
-projeto/   -> O código completo do projeto (o que roda no Lovable). Não é
-              necessário para colocar o site no ar; está aqui como backup.
-LEIA-ME.txt-> Este arquivo.
+ESTRUTURA
+---------
+Esta pasta contém o site pronto, sem framework. É só esta pasta que você
+precisa para publicar.
 
-A PASTA site/ CONTÉM
--------------------
 index.html    -> a página do site (abertura, lista de imóveis, contato)
 admin.html    -> o painel administrativo (troca de imóveis e fotos)
 style.css     -> todas as cores, fontes e layouts
@@ -21,22 +17,20 @@ data.js       -> os imóveis que aparecem para todo visitante
 COMO PUBLICAR
 -------------
 1. Tenha uma hospedagem (Hostinger, Locaweb, Netlify, Vercel, GitHub Pages...).
-2. Envie o CONTEÚDO da pasta site/ para a pasta pública da hospedagem
+2. Envie TODO o CONTEÚDO desta pasta para a pasta pública da hospedagem
    (costuma chamar public_html, www ou dist).
 3. O site abre em http://seusite.com.br  e o painel em
    http://seusite.com.br/admin.html
 
 COMO ENTRAR NO PAINEL
 ---------------------
-Abra admin.html e digite a senha: oscar2026
-Para trocar a senha: acesse https://emn178.github.io/online-tools/sha256.html,
-digite a nova senha, copie o código gerado e substitua o valor de SENHA_HASH
-na linha 2 do arquivo admin.js.
+Abra admin.html e digite a senha: 123
+Para trocar a senha: use o botão "Alterar senha" no próprio painel.
 
 COMO ADICIONAR IMÓVEIS
 ----------------------
 Pelo painel: entrar, preencher o formulário, escolher as fotos e salvar.
-As mudanças ficam salvas no navegador de quem cadastrou. Para que todos vejam,
+As mudanças ficam salvas no navegador de quem cadastrar. Para que todos vejam,
 clique em "Exportar data.js" e substitua o arquivo data.js da hospedagem pelo
 arquivo baixado.
 
