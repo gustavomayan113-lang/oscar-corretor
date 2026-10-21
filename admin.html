@@ -23,7 +23,7 @@
     <form class="box" id="form">
       <h2 id="ftitle">Novo imóvel</h2>
       <label>Título<input id="titulo" required placeholder="Ex: Apartamento com vista para o mar"></label>
-      <label>Tipo<select id="tipo"><option>Casa</option><option>Apartamento</option><option>Cobertura</option><option>Terreno</option><option>Comercial</option></select></label>
+      <label>Tipo<select id="tipo"><option>Casa</option><option>Apartamento</option><option>Cobertura</option><option>Terreno</option><option>Comercial</option><option>Chácara</option><option>Sobrado</option></select></label>
       <label>Localização<input id="local" required placeholder="Bairro, Cidade"></label>
       <label>Preço<input id="preco" required placeholder="R$ 850.000"></label>
       <div class="row"><label>Quartos<input id="quartos" type="number" min="0" value="3"></label><label>Banheiros<input id="banheiros" type="number" min="0" value="2"></label><label>Área m²<input id="area" type="number" min="0" value="100"></label></div>
@@ -37,12 +37,15 @@
     <div class="box">
       <h2>Imóveis cadastrados (<span id="n">0</span>)</h2>
       <div class="list" id="list"></div>
+      <div class="pub-status" id="pubStatus"></div>
       <div class="tools">
+        <button class="btn btn-gold compact" id="pub">Publicar no site</button>
         <button class="sm" id="exp">Exportar data.js</button>
         <button class="sm" id="bkp">Baixar backup (.json)</button>
-        <label class="sm" style="margin:0 0 0 6px;font-weight:400">Restaurar backup<input type="file" id="imp" accept=".json" style="display:none"></label>
+        <label class="sm" style="margin:0;font-weight:400">Restaurar backup<input type="file" id="imp" accept=".json" style="display:none"></label>
+        <button class="sm" id="rst">Restaurar lista padrão</button>
       </div>
-      <p style="color:var(--muted);font-size:13px;margin-top:14px">Os imóveis ficam salvos neste navegador. Para que todos os visitantes vejam, clique em "Exportar data.js" e substitua o arquivo data.js do site.</p>
+      <p style="color:var(--muted);font-size:13px;margin-top:14px" id="pubDica">Os imóveis ficam salvos neste navegador. Clique em <b>Publicar no site</b> para que eles apareçam para todos os visitantes.</p>
     </div>
   </div>
 </div>
@@ -63,5 +66,36 @@
     </form>
   </div>
 </div>
+
+<div class="modal" id="modalExcluir">
+  <div class="modal-box" style="max-width:480px">
+    <h2>Excluir imóvel</h2>
+    <div class="del-info" id="delInfo"></div>
+    <p class="del-aviso">O imóvel sai da lista na hora e da próxima publicação do site. Dá para desfazer logo em seguida.</p>
+    <div class="del-acoes">
+      <button class="sm" id="cancelExcluir" type="button">Cancelar</button>
+      <button class="sm del" id="confirmExcluir" type="button">Excluir imóvel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalPub">
+  <div class="modal-box" style="max-width:540px">
+    <h2>Publicar no site</h2>
+    <form id="fPub" style="padding:0 24px 24px;display:flex;flex-direction:column;gap:14px">
+      <label style="text-align:left">Repositório (GitHub)<input id="pubRepo" placeholder="gustavomayan113-lang/oscar-corretor"></label>
+      <label style="text-align:left">Branch<input id="pubBranch" placeholder="main"></label>
+      <label style="text-align:left">Token do GitHub<input id="pubToken" type="password" placeholder="github_pat_..."></label>
+      <p style="color:var(--muted);font-size:13px;margin:0">O token fica salvo apenas neste navegador. No GitHub: Settings → Developer settings → Personal access tokens → Fine-grained, com permissão <b>Contents: read and write</b> no repositório. A Vercel publica sozinha em instantes, desde que o projeto esteja conectado ao repositório (Vercel → Project → Settings → Git). Se não estiver, use <b>Exportar data.js</b> e envie o arquivo pelo painel da Vercel.</p>
+      <div class="err" id="pubErr" style="text-align:left"></div>
+      <div class="del-acoes">
+        <button type="button" class="sm" id="cancelPub" style="width:auto">Fechar</button>
+        <button type="submit" class="btn btn-gold" style="width:auto">Salvar e publicar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span><button class="sm" id="toastAcao" type="button" style="display:none">Desfazer</button></div>
 </body>
 </html>

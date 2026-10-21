@@ -1,9 +1,12 @@
 function getImoveis(){
-  const s = localStorage.getItem('oscar_imoveis');
-  return s ? JSON.parse(s) : (window.IMOVEIS_PADRAO || []);
+  try {
+    const s = localStorage.getItem('oscar_imoveis');
+    const v = s ? JSON.parse(s) : null;
+    return Array.isArray(v) ? v : (window.IMOVEIS_PADRAO || []);
+  } catch { return window.IMOVEIS_PADRAO || []; }
 }
 const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const imoveis = getImoveis();
+let imoveis = getImoveis().filter(i => !i.vendido);
 let filtro = 'Todos';
 document.getElementById('ano').textContent = new Date().getFullYear();
 document.getElementById('count').textContent = imoveis.length;
@@ -18,7 +21,7 @@ function render(){
   const lista = imoveis.filter(i => filtro==='Todos' || i.tipo===filtro);
   document.getElementById('grid').innerHTML = lista.length ? lista.map(i => `
     <article class="card reveal" data-id="${i.id}">
-      <div class="img" style="background-image:url('${i.fotos?.[0]||''}')"><span class="tag">${esc(i.tipo)}</span></div>
+      <div class="img" style="background-image:url('${esc(i.fotos?.[0]||'')}')"><span class="tag">${esc(i.tipo)}</span></div>
       <div class="body"><h3>${esc(i.titulo)}</h3><div class="loc">📍 ${esc(i.local)}</div>
         <div class="feats"><span>🛏 ${esc(i.quartos)} quartos</span><span>🛁 ${esc(i.banheiros)} banh.</span><span>📐 ${esc(i.area)} m²</span></div>
         <div class="price">${esc(i.preco)}</div></div>
@@ -30,8 +33,8 @@ function abrir(id){
   const i = imoveis.find(x => x.id===id); if(!i) return;
   const fotos = i.fotos?.length ? i.fotos : [''];
   document.getElementById('mbox').innerHTML = `
-    <div class="gallery-main" id="gm" style="background-image:url('${fotos[0]}')"></div>
-    <div class="thumbs">${fotos.map((f,n)=>`<img src="${f}" class="${n?'':'on'}">`).join('')}</div>
+    <div class="gallery-main" id="gm" style="background-image:url('${esc(fotos[0])}')"></div>
+    <div class="thumbs">${fotos.map((f,n)=>`<img src="${esc(f)}" class="${n?'':'on'}">`).join('')}</div>
     <div class="modal-body"><span class="tag" style="position:static">${esc(i.tipo)}</span>
       <h3>${esc(i.titulo)}</h3><div class="loc" style="color:var(--muted)">📍 ${esc(i.local)}</div>
       <div class="price">${esc(i.preco)}</div>
@@ -52,4 +55,11 @@ function observe(){
   const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {threshold:.1});
   document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
 }
+window.addEventListener('storage', e => {
+  if(e.key !== 'oscar_imoveis') return;
+  imoveis = getImoveis().filter(i => !i.vendido);
+  document.getElementById('count').textContent = imoveis.length;
+  if(!imoveis.some(i => i.tipo === filtro)) filtro = 'Todos';
+  renderFiltros(); render();
+});
 renderFiltros(); render();

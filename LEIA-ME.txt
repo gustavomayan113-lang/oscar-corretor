@@ -7,12 +7,13 @@ Esta pasta contém o site pronto, sem framework. É só esta pasta que você
 precisa para publicar.
 
 index.html    -> a página do site (abertura, lista de imóveis, contato)
-admin.html    -> o painel administrativo (troca de imóveis e fotos)
+admin.html    -> o painel administrativo (cadastro, fotos, exclusão, publicação)
 style.css     -> todas as cores, fontes e layouts
 app.js        -> a lógica do site (lista, filtros, galeria)
-admin.js      -> a lógica do painel (senha, cadastro, exportar)
+admin.js      -> a lógica do painel (senha, cadastro, excluir, publicar)
 data.js       -> os imóveis que aparecem para todo visitante
-*.jpg         -> as fotos (hero.jpg é a foto de abertura)
+imagens/      -> as fotos publicadas (criado na primeira publicação)
+*.jpg         -> as fotos de exemplo (hero.jpg é a foto de abertura)
 
 COMO PUBLICAR
 -------------
@@ -22,21 +23,48 @@ COMO PUBLICAR
 3. O site abre em http://seusite.com.br  e o painel em
    http://seusite.com.br/admin.html
 
+Na Vercel o projeto precisa ter a raiz do repositório como pasta do site
+(Vercel → Project → Settings → Build & Development → Output Directory = .).
+
 COMO ENTRAR NO PAINEL
----------------------
+----------------------
 Abra admin.html e digite a senha: 123
 Para trocar a senha: use o botão "Alterar senha" no próprio painel.
 
 COMO ADICIONAR IMÓVEIS
 ----------------------
-Pelo painel: entrar, preencher o formulário, escolher as fotos e salvar.
-As mudanças ficam salvas no navegador de quem cadastrar. Para que todos vejam,
-clique em "Exportar data.js" e substitua o arquivo data.js da hospedagem pelo
-arquivo baixado.
+1. Abra o painel, entre com a senha e preencha o formulário ao lado.
+   A primeira foto é a capa. Clique em "Salvar imóvel".
+2. O imóvel entra na lista do painel na hora (e aparece no site, no mesmo
+   navegador).
+3. Clique em "Publicar no site" para que TODOS os visitantes vejam.
+   - Na primeira vez o painel pede o repositório do GitHub e um token:
+     Settings → Developer settings → Personal access tokens → Fine-grained,
+     com permissão "Contents: read and write" no repositório.
+   - O painel envia o arquivo data.js e as fotos (pasta imagens/) para o
+     GitHub e a Vercel publica sozinho em 1-2 minutos.
+   - Se preferir, use "Exportar data.js" e substitua o arquivo no repositório
+     pelo arquivo baixado (ele também vai copiado para a área de transferência).
+
+EXCLUIR UM IMÓVEL
+-----------------
+No painel, em cada imóvel, clique em "Excluir". Abre uma janela de
+confirmação com a foto e o nome do imóvel. Depois de excluir aparece um
+aviso com o botão "Desfazer" (vale por alguns segundos). O imóvel também
+sai da próxima publicação do site.
+
+OUTROS BOTÕES DO PAINEL
+-----------------------
+- "Marcar vendido" / "Reativar": tira ou devolve o imóvel da exposição do
+  site (vendidos não aparecem para os visitantes).
+- "Baixar backup (.json)" / "Restaurar backup": salva e recupera a lista.
+- "Restaurar lista padrão": volta para os imóveis que já vinham no site.
+- "Alterar senha": troca a senha de acesso ao painel.
 
 OBSERVAÇÕES
 -----------
-- Não há banco de dados: os imóveis que todo mundo vê vêm do arquivo data.js.
+- Não há banco de dados: o que todo mundo vê vem do arquivo data.js; o
+  painel guarda uma cópia no navegador de quem cadastra.
 - O número de WhatsApp em index.html (5500000000000) e os textos "15+ anos" e
   "500+ famílias" são provisórios. Troque pelos dados reais.
 - Preços, endereços e medidas dos imóveis de exemplo são fictícios.
