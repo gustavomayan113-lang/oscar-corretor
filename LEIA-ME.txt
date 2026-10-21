@@ -19,12 +19,27 @@ admin.html    -> o painel administrativo (cadastro, fotos, exclusão, publicaç�
 style.css     -> todas as cores, fontes e layouts
 app.js        -> a lógica do site (lista, filtros, galeria)
 admin.js      -> a lógica do painel (senha, cadastro, excluir, publicar)
+api/publish.js-> função do servidor que publica os imóveis sozinha (Vercel)
 data.js       -> os imóveis que aparecem para todo visitante
 imagens/      -> as fotos publicadas (criado na primeira publicação)
 *.jpg         -> as fotos de exemplo (hero.jpg é a foto de abertura)
 
-COMO PUBLICAR
--------------
+COMO FUNCIONA A PUBLICAÇÃO (automática)
+---------------------------------------
+O site publica sozinho. Nobody precisa mexer em token, repositório ou GitHub:
+1. O dono preenche o formulário e clica em "Salvar imóvel".
+2. O painel envia a lista e as fotos para a função api/publish.js, que grava
+   tudo no repositório com um único commit.
+3. A Vercel publica em 1-2 minutos e o anúncio aparece para todos.
+
+Isso vale para cadastrar, editar, excluir, desfazer, marcar como vendido e
+restaurar a lista padrão: tudo é publicado sozinho.
+
+O botão "Publicar agora" (ao lado do status) republica a lista na hora, se
+alguma alteração ficar pendente.
+
+COMO PUBLICAR NA HOSPEDAGEM
+---------------------------
 1. Tenha uma hospedagem (Hostinger, Locaweb, Netlify, Vercel, GitHub Pages...).
 2. Envie TODO o CONTEÚDO desta pasta para a pasta pública da hospedagem
    (costuma chamar public_html, www ou dist).
@@ -36,37 +51,35 @@ Na Vercel o projeto precisa ter a raiz do repositório como pasta do site
 
 COMO ENTRAR NO PAINEL
 ----------------------
-Abra admin.html e digite a senha: 123
-- Para trocar a senha, edite a linha 1 do arquivo admin.js:
-  const SENHA_PADRAO = '123';   ->   const SENHA_PADRAO = 'a-senha-nova';
-- A senha não é guardada em lugar nenhum: nem no site, nem no navegador.
-  Se o navegador preencher o campo sozinho, limpe e digite de novo.
+A senha é validada pelo servidor (variável de ambiente ADMIN_PASS na Vercel),
+por isso o painel só abre pelo site publicado. O dono entra uma vez e o
+navegador lembra (é só preencher o formulário dali em diante).
+- Sem internet, o painel abre com a senha local: 123.
+- Para trocar a senha: Vercel → Project → Settings → Environment Variables →
+  ADMIN_PASS (e reiniciar o deploy).
 
 COMO ADICIONAR IMÓVEIS
 ----------------------
-1. Abra o painel, entre com a senha e preencha o formulário ao lado.
-   A primeira foto é a capa. Clique em "Salvar imóvel".
-2. O imóvel entra na lista do painel na hora (e aparece no site, no mesmo
-   navegador).
-3. Clique em "Publicar no site" para que TODOS os visitantes vejam.
-   - CAMPO AUTOMÁTICO (com token do GitHub): na primeira vez o painel pede o
-     repositório e um token (Settings → Developer settings → Personal access
-     tokens → Tokens (classic) → marque "repo"). O painel envia o data.js e as
-     fotos (pasta imagens/) para o GitHub e a Vercel publica em 1-2 minutos.
-     Depois de configurado uma vez, todo imóvel salvo vai para o site sozinho.
-   - SEM TOKEN (dois passos, dentro da mesma janela):
-     1) "Abrir o data.js no GitHub" abre o editor do GitHub com o conteúdo já
-        copiado: é só colar (Ctrl+V) e clicar em "Commit changes".
-     2) "Baixar pacote com as fotos" gera um zip com o data.js e a pasta
-        imagens/ para arrastar em "Add file → Upload files".
-     A Vercel publica do mesmo jeito.
+1. Abra o painel pelo site (https://oscar-corretor-psi.vercel.app/admin.html)
+   e entre com a senha.
+2. Preencha o formulário ao lado. A primeira foto é a capa.
+3. Clique em "Salvar imóvel". Pronto: o imóvel já entra no site (1-2 min).
+   Não há botão de publicar, token ou passo manual.
+
+PUBLICAR NA MÃO (só em caso de emergência)
+-------------------------------------------
+No fim do painel há a seção "Publicação manual (uso técnico)", com:
+- "Publicar com token": usa um token do GitHub guardado só no navegador.
+- "Abrir o data.js no GitHub" e "Baixar pacote com as fotos": envia o
+  data.js e a pasta imagens/ pelo próprio GitHub.
+Use apenas se a publicação automática estiver fora do ar.
 
 EXCLUIR UM IMÓVEL
 -----------------
 No painel, em cada imóvel, clique em "Excluir". Abre uma janela de
 confirmação com a foto e o nome do imóvel. Depois de excluir aparece um
-aviso com o botão "Desfazer" (vale por alguns segundos). O imóvel também
-sai da próxima publicação do site.
+aviso com o botão "Desfazer" (vale por alguns segundos). A exclusão é
+publicada sozinha: o imóvel some do site em 1-2 minutos.
 
 OUTROS BOTÕES DO PAINEL
 -----------------------
@@ -81,6 +94,10 @@ OBSERVAÇÕES
   painel guarda uma cópia no navegador de quem cadastra.
 - Ou seja: um imóvel só aparece para os visitantes DEPOIS de publicado.
   Antes disso ele só existe no navegador de quem cadastrou.
+- A publicação automática depende da função api/publish.js e das variáveis de
+  ambiente na Vercel (GITHUB_TOKEN, GITHUB_REPO, GITHUB_BRANCH, PUBLISH_KEY e
+  ADMIN_PASS). Se a Vercel mudar de plano ou o token do GitHub for revogado,
+  é só recriá-las e republicar.
 - O número de WhatsApp em index.html (5500000000000) e os textos "15+ anos" e
   "500+ famílias" são provisórios. Troque pelos dados reais.
 - Preços, endereços e medidas dos imóveis de exemplo são fictícios.
